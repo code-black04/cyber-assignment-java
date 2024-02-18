@@ -1,4 +1,3 @@
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,7 +11,7 @@ public class Server {
     private String serverPort;
     private Map<String, Queue<ReceivedMessage>> messageQueue;
 
-    public Server(String serverPort){
+    public Server(String serverPort) {
         this.messageQueue = new HashMap<>();
         this.serverPort = serverPort;
     }
@@ -32,7 +31,8 @@ public class Server {
         }
 
     }
-    public void startServer() throws Exception{
+
+    public void startServer() throws Exception {
         try (ServerSocket serverSocket = new ServerSocket(Integer.parseInt(serverPort))) {
             System.out.println("Waiting incoming connection requests : ");
             createClientHandlerForEachClient(serverSocket);

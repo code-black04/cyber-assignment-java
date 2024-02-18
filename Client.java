@@ -26,6 +26,20 @@ public class Client {
         this.senderUserId = senderUserId;
     }
 
+    public static void main(String[] args) {
+
+        if (args.length != 3) {
+            System.err.println("Client UserId has not been passed");
+            System.exit(-1);
+        }
+
+        String host = args[0];
+        String port = args[1];
+        String senderUserId = args[2];
+        Client client = new Client(host, port, senderUserId);
+        client.init();
+    }
+
     private void init() {
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -118,7 +132,7 @@ public class Client {
             long serverTimestamp = dataInputStream.readLong();
             int messageCount = dataInputStream.readInt();
 
-            if (messageCount != 0){
+            if (messageCount != 0) {
                 System.out.println("There are " + messageCount + " message(s) for you.");
                 for (int i = 0; i < messageCount; i++) {
                     int messageLength = dataInputStream.readInt();
@@ -148,20 +162,6 @@ public class Client {
             System.err.println("Cannot connect to server.");
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-
-        if (args.length != 3) {
-            System.err.println("Client UserId has not been passed");
-            System.exit(-1);
-        }
-
-        String host = args[0];
-        String port = args[1];
-        String senderUserId = args[2];
-        Client client = new Client(host, port, senderUserId);
-        client.init();
     }
 
     private class SendMessage {
