@@ -14,11 +14,11 @@ public class RSAKeyGenerator {
         kpg.initialize(2048);
         KeyPair kp = kpg.genKeyPair();
 
-        FileOutputStream fos = new FileOutputStream("src/main/resources/keys/" + args[0] + ".pub");
+        FileOutputStream fos = new FileOutputStream(args[0] + ".pub");
         fos.write(kp.getPublic().getEncoded());
         fos.close();
 
-        fos = new FileOutputStream("src/main/resources/keys/" + args[0] + ".prv");
+        fos = new FileOutputStream(args[0] + ".prv");
         fos.write(kp.getPrivate().getEncoded());
         fos.close();
     }

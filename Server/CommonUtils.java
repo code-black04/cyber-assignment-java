@@ -63,6 +63,10 @@ public class CommonUtils {
         // verify signature
         sig.initVerify(pubKey);
         sig.update(contentReceived.getBytes());
-        return sig.verify(signatureReceived);
+        Boolean signatureVerification = sig.verify(signatureReceived);
+        if (!signatureVerification) {
+            System.out.println("Signature verification failed..");
+        }
+        return signatureVerification;
     }
 }
