@@ -34,7 +34,7 @@ public class Server {
 
     public void startServer() throws Exception {
         try (ServerSocket serverSocket = new ServerSocket(Integer.parseInt(serverPort))) {
-            System.out.println("Waiting incoming connection requests: ");
+            System.out.println("Waiting incoming connection requests: \n");
             createClientHandlerForEachClient(serverSocket);
         } catch (IOException e) {
             e.printStackTrace();

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -85,7 +84,7 @@ class ServerClientHandler implements Runnable {
             if (CommonUtils.verifySignature(contentToBeVerified, clientUserId, signature)) {
                 if (allEncryptedMessageData != null) {
                     message = CommonUtils.decryptMessageWithPrivate(allEncryptedMessageData, "server");
-                    System.out.println("message: " + message);
+                    System.out.println("message: " + message + "\n");
                     byte[] messageBody = createMessageBody(message, recipientUserId, clientUserId);
                     Server.ReceivedMessage receivedMessage = new Server.ReceivedMessage(clientUserId, LocalDateTime.now(), messageBody);
                     dos.writeUTF("Server Received " + message);
@@ -145,7 +144,7 @@ class ServerClientHandler implements Runnable {
         dos.writeLong(timestamp);
 
         if (receivedMessageQueue != null && !receivedMessageQueue.isEmpty()) {
-            System.out.println("delivering " + receivedMessageQueue.size() + " message(s)...");
+            System.out.println("delivering " + receivedMessageQueue.size() + " message(s)...\n");
             dos.writeInt(receivedMessageQueue.size());
             receivedMessageQueue.forEach(messageReceived -> {
                 try {
@@ -157,7 +156,7 @@ class ServerClientHandler implements Runnable {
                 }
             });
         } else {
-            System.out.println("no incoming message.");
+            System.out.println("no incoming message.\n");
             dos.writeInt(0);
         }
     }

@@ -8,7 +8,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -96,7 +95,7 @@ public class Client {
                     }
                 }
             } else {
-                System.out.println("There are 0 message(s) for you.");
+                System.out.println("There are 0 message(s) for you.\n");
             }
             CommonUtils.callCloseSocketAndStreams(dataInputStream, dataOutputStream, s);
         } catch (Exception e) {
@@ -185,32 +184,17 @@ public class Client {
             return senderUserId;
         }
 
-        public void setSenderUserId(String senderUserId) {
-            this.senderUserId = senderUserId;
-        }
-
         public byte[] getRecipientUserId() {
             return recipientUserId;
-        }
-
-        public void setRecipientUserId(byte[] recipientUserId) {
-            this.recipientUserId = recipientUserId;
         }
 
         public byte[] getMessageBody() {
             return messageBody;
         }
 
-        public void setMessageBody(byte[] messageBody) {
-            this.messageBody = messageBody;
-        }
-
         public String getMessageType() {
             return messageType;
         }
 
-        public void setMessageType(String messageType) {
-            this.messageType = messageType;
-        }
     }
 }
