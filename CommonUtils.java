@@ -88,19 +88,35 @@ public class CommonUtils {
     }
 
     public static byte[] encryptMessageWithPublicKey(String messageToBeEncrypted, String publicKeyName) throws BadPaddingException, Exception {
-        Cipher encryptedCipher = Cipher.getInstance("RSA");
-        encryptedCipher.init(Cipher.ENCRYPT_MODE, readPublicKey(publicKeyName));
-        byte[] secretMessageBytes = messageToBeEncrypted.getBytes(StandardCharsets.UTF_8);
-        byte[] encryptedMessageBytes = encryptedCipher.doFinal(secretMessageBytes);
-        return encryptedMessageBytes;
+        try {
+            Cipher encryptedCipher = Cipher.getInstance("RSA");
+            PublicKey publicKey = readPublicKey(publicKeyName);
+            if (publicKey == null) {
+                throw new IllegalArgumentException("Public key not found for user: " + publicKeyName);
+            }
+            encryptedCipher.init(Cipher.ENCRYPT_MODE, publicKey);
+            byte[] secretMessageBytes = messageToBeEncrypted.getBytes(StandardCharsets.UTF_8);
+            byte[] encryptedMessageBytes = encryptedCipher.doFinal(secretMessageBytes);
+            return encryptedMessageBytes;
+        } catch (Exception e) {
+            throw new Exception("Encryption failed");
+        }
     }
 
     public static String decryptMessageWithPrivate(byte[] encryptedMessageBytes, String userId) throws BadPaddingException, Exception{
-        Cipher decryptCipher = Cipher.getInstance("RSA");
-        decryptCipher.init(Cipher.DECRYPT_MODE, readPrivateKey(userId));
-        byte[] decryptedMessageBytes = decryptCipher.doFinal(encryptedMessageBytes);
-        String decryptedMessage = new String(decryptedMessageBytes, StandardCharsets.UTF_8);
-        return decryptedMessage;
+        try {
+            Cipher decryptCipher = Cipher.getInstance("RSA");
+            PrivateKey privateKey = readPrivateKey(userId);
+            if (privateKey == null) {
+                throw new IllegalArgumentException("Private key not found for user: " + userId);
+            }
+            decryptCipher.init(Cipher.DECRYPT_MODE, privateKey);
+            byte[] decryptedMessageBytes = decryptCipher.doFinal(encryptedMessageBytes);
+            String decryptedMessage = new String(decryptedMessageBytes, StandardCharsets.UTF_8);
+            return decryptedMessage;
+        } catch (Exception e) {
+            throw new Exception("Decryption failed");
+        }
     }
 
     public static String writeFormattedTimestamp(long timestamp) {

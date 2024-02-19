@@ -111,8 +111,9 @@ public class Client {
             System.out.println("Enter your message: ");
             String message = scanner.nextLine();
             sendMessage(message, recipientUserId);
+            System.exit(1);
         } else if (actionSelection.equalsIgnoreCase("n")) {
-            System.exit(0);
+            System.exit(1);
         }
     }
 
@@ -135,23 +136,24 @@ public class Client {
 
             DataInputStream dataInputStream = new DataInputStream(s.getInputStream());
             DataOutputStream dataOutputStream = new DataOutputStream(s.getOutputStream());
-
-            dataOutputStream.writeUTF(sendMessage.getSenderUserId());
-            dataOutputStream.writeUTF(sendMessage.getMessageType());
             long timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-            dataOutputStream.writeLong(timestamp);
-            dataOutputStream.writeInt(sendMessage.getRecipientUserId().length);
-            dataOutputStream.write(sendMessage.getRecipientUserId());
-            dataOutputStream.writeInt(sendMessage.getMessageBody().length);
-            dataOutputStream.write(sendMessage.getMessageBody());
-
+            writeMessageToDataOutputStream(sendMessage, dataOutputStream, timestamp);
             addSignature(sendMessage, timestamp, dataOutputStream);
-            
             CommonUtils.callCloseSocketAndStreams(dataInputStream, dataOutputStream, s);
         } catch (Exception e) {
             System.err.println("Cannot connect to server.");
             e.printStackTrace();
         }
+    }
+
+    private static void writeMessageToDataOutputStream(SendMessage sendMessage, DataOutputStream dataOutputStream, long timestamp) throws Exception {
+        dataOutputStream.writeUTF(sendMessage.getSenderUserId());
+        dataOutputStream.writeUTF(sendMessage.getMessageType());
+        dataOutputStream.writeLong(timestamp);
+        dataOutputStream.writeInt(sendMessage.getRecipientUserId().length);
+        dataOutputStream.write(sendMessage.getRecipientUserId());
+        dataOutputStream.writeInt(sendMessage.getMessageBody().length);
+        dataOutputStream.write(sendMessage.getMessageBody());
     }
 
     private void addSignature(SendMessage sendMessage, long timestamp, DataOutputStream dataOutputStream) throws Exception {
