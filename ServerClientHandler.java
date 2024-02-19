@@ -47,7 +47,7 @@ class ServerClientHandler implements Runnable {
             if (messageType.equals(SEND_MESSAGE_TYPE)) {
                 try {
                     System.out.println("incoming message from " + clientUserId);
-                    System.out.println(LocalDateTime.now());
+                    System.out.println(CommonUtils.writeFormattedTimestamp(timeStamp));
                     processMessageFromClient(dis, clientUserId, dos, timeStamp);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -85,7 +85,7 @@ class ServerClientHandler implements Runnable {
                 if (allEncryptedMessageData != null) {
                     message = CommonUtils.decryptMessageWithPrivate(allEncryptedMessageData, "server");
                     System.out.println("message: " + message + "\n");
-                    byte[] messageBody = createMessageBody(message, recipientUserId, clientUserId);
+                    byte[] messageBody = createMessageBody(message, recipientUserId, clientUserId, timeStamp);
                     Server.ReceivedMessage receivedMessage = new Server.ReceivedMessage(clientUserId, LocalDateTime.now(), messageBody);
                     dos.writeUTF("Server Received " + message);
                     addMessageToQueue(recipientUserId, receivedMessage);
@@ -103,9 +103,9 @@ class ServerClientHandler implements Runnable {
         }
     }
 
-    public static byte[] createMessageBody(String message, String recipientUserId, String clientUserId) {
+    public static byte[] createMessageBody(String message, String recipientUserId, String clientUserId, long timestamp) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Date: " + LocalDateTime.now() + "\n");
+        stringBuilder.append("Date: " + CommonUtils.writeFormattedTimestamp(timestamp) + "\n");
         try {
             stringBuilder.append("Message: " + message + "\n");
             return CommonUtils.encryptMessageWithPublicKey(stringBuilder.toString(), recipientUserId);

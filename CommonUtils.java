@@ -13,6 +13,10 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class CommonUtils {
     public static void callCloseSocketAndStreams(DataInputStream dataInputStream, DataOutputStream dataOutputStream, Socket s) throws Exception {
@@ -97,5 +101,18 @@ public class CommonUtils {
         byte[] decryptedMessageBytes = decryptCipher.doFinal(encryptedMessageBytes);
         String decryptedMessage = new String(decryptedMessageBytes, StandardCharsets.UTF_8);
         return decryptedMessage;
+    }
+
+    public static String writeFormattedTimestamp(long timestamp) {
+        try {
+            LocalDateTime localDateTime = LocalDateTime.ofEpochSecond(timestamp, 0, ZoneOffset.UTC);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss 'GMT' yyyy", Locale.ENGLISH);
+            String formattedTimestamp = formatter.format(localDateTime);
+            return formattedTimestamp;
+        } catch (java.lang.Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+        return "";
     }
 }
