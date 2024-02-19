@@ -1,4 +1,4 @@
-- Command to compile
+- Command to compile .java files
 ```
 javac *.java
 ```
@@ -7,17 +7,17 @@ javac *.java
 java RSAKeyGenerator server
 ```
 
-- Command to create public and private key for client with userId
+- Command to create public and private key for client with <<userId>>
 ```
 java RSAKeyGenerator <<userId>>
 ```
 
-- Command to run server
+- Command to run server at any <<port>>
 ```
-java Server 8082
+java Server <<port>>
 ```
 
-- Command to run client with userId
+- Command to run client with <<port>> and <<userId>>
 ```
-java Client localhost 8082 <<userId>>
+java Client localhost <<port>> <<userId>>
 ```

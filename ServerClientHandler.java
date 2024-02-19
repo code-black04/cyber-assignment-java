@@ -29,10 +29,14 @@ class ServerClientHandler implements Runnable {
 
     @Override
     public void run() {
-        handleClient();
+        try{
+            handleClient();
+        } catch (Exception e) {
+            e.getMessage();
+        }
     }
 
-    public void handleClient() throws RuntimeException {
+    public void handleClient() throws RuntimeException, Exception {
         try {
             DataInputStream dis = new DataInputStream(socket.getInputStream());
             DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
@@ -104,7 +108,7 @@ class ServerClientHandler implements Runnable {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Date: " + LocalDateTime.now() + "\n");
         try {
-            stringBuilder.append("Message: " + message + "\n\n");
+            stringBuilder.append("Message: " + message + "\n");
             return CommonUtils.encryptMessageWithPublicKey(stringBuilder.toString(), recipientUserId);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -117,7 +121,7 @@ class ServerClientHandler implements Runnable {
         messageQueue.get(recipientUserId).add(receivedMessage);
     }
 
-    private void fetchClientMessage(DataInputStream dis, String clientUserId, DataOutputStream dos) throws IOException, NoSuchAlgorithmException {
+    private void fetchClientMessage(DataInputStream dis, String clientUserId, DataOutputStream dos) throws Exception {
         try {
             Queue<Server.ReceivedMessage> receivedMessageQueue = getClientMessagesQueue(clientUserId);
             displayMessageSummaryToClient(receivedMessageQueue, dos);
@@ -158,7 +162,7 @@ class ServerClientHandler implements Runnable {
         }
     }
 
-    private static void addSignature(byte[] messageBody, long timestamp, DataOutputStream dataOutputStream, String senderUserId) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException, SignatureException {
+    private static void addSignature(byte[] messageBody, long timestamp, DataOutputStream dataOutputStream, String senderUserId) throws Exception {
         String contentToBeSigned = new String(messageBody).concat(String.valueOf(timestamp));
         byte[] signature = CommonUtils.createSignature(contentToBeSigned, senderUserId);
         dataOutputStream.writeInt(signature.length);

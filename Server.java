@@ -18,12 +18,12 @@ public class Server {
 
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.err.println("Server port has not been passed");
+            System.err.println("Usage: java Server <<port>>");
             System.exit(-1);
         }
 
         String port = args[0];
-        System.out.println(port);
+        System.out.println("Starting server at port: " + port + "\n");
         try {
             new Server(port).startServer();
         } catch (Exception e) {
@@ -34,7 +34,7 @@ public class Server {
 
     public void startServer() throws Exception {
         try (ServerSocket serverSocket = new ServerSocket(Integer.parseInt(serverPort))) {
-            System.out.println("Waiting incoming connection requests : ");
+            System.out.println("Waiting incoming connection requests: ");
             createClientHandlerForEachClient(serverSocket);
         } catch (IOException e) {
             e.printStackTrace();

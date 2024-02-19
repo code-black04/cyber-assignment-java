@@ -6,7 +6,7 @@ public class RSAKeyGenerator {
     public static void main(String[] args) throws Exception {
 
         if (args.length != 1) {
-            System.err.println("Usage: java RSAKeyGen userid");
+            System.err.println("Usage: java RSAKeyGen <<userid>>");
             System.exit(-1);
         }
 

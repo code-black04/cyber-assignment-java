@@ -18,7 +18,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 public class CommonUtils {
-    public static void callCloseSocketAndStreams(DataInputStream dataInputStream, DataOutputStream dataOutputStream, Socket s) throws IOException {
+    public static void callCloseSocketAndStreams(DataInputStream dataInputStream, DataOutputStream dataOutputStream, Socket s) throws Exception {
         dataInputStream.close();
         dataOutputStream.close();
         s.close();
@@ -47,7 +47,7 @@ public class CommonUtils {
     }
 
     //To create signature using sender's private key
-    public static byte[] createSignature(String contentSent, String privateKeyName) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, IOException, InvalidKeySpecException {
+    public static byte[] createSignature(String contentSent, String privateKeyName) throws Exception {
         // create signature
         PrivateKey prvKey = readPrivateKey(privateKeyName);
         Signature sig = Signature.getInstance("SHA256withRSA");
@@ -57,7 +57,7 @@ public class CommonUtils {
     }
 
     //To verify signature by recipient using sender's public key
-    public static Boolean verifySignature(String contentReceived, String publicKeyName, byte[] signatureReceived) throws InvalidKeyException, SignatureException, NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+    public static Boolean verifySignature(String contentReceived, String publicKeyName, byte[] signatureReceived) throws Exception {
         PublicKey pubKey = readPublicKey(publicKeyName);
         Signature sig = Signature.getInstance("SHA256withRSA");
         // verify signature
@@ -67,7 +67,7 @@ public class CommonUtils {
     }
 
     //To Read Private Key
-    public static PrivateKey readPrivateKey(String userId) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public static PrivateKey readPrivateKey(String userId) throws Exception {
         File f = new File(userId + ".prv");
         byte[] keyBytes = Files.readAllBytes(f.toPath());
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
@@ -77,7 +77,7 @@ public class CommonUtils {
     }
 
     //To Read Public Key
-    public static PublicKey readPublicKey(String userId) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public static PublicKey readPublicKey(String userId) throws Exception {
         File f = new File(userId + ".pub");
         byte[] keyBytes = Files.readAllBytes(f.toPath());
         X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(keyBytes);

@@ -29,7 +29,7 @@ public class Client {
     public static void main(String[] args) {
 
         if (args.length != 3) {
-            System.err.println("Client UserId has not been passed");
+            System.err.println("Usage: java Client localhost <<port>> <<userid>>");
             System.exit(-1);
         }
 
@@ -51,8 +51,7 @@ public class Client {
                     String actionSelection = scanner.nextLine();
                     try {
                         writeMessageDetailsAndSend(actionSelection, scanner);
-                    } catch (IOException | InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException |
-                             NoSuchAlgorithmException | IllegalBlockSizeException | BadPaddingException e) {
+                    } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
@@ -156,7 +155,7 @@ public class Client {
         }
     }
 
-    private void addSignature(SendMessage sendMessage, long timestamp, DataOutputStream dataOutputStream) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException, SignatureException {
+    private void addSignature(SendMessage sendMessage, long timestamp, DataOutputStream dataOutputStream) throws Exception {
         String contentToBeSigned = new String(sendMessage.getMessageBody()).concat(String.valueOf(timestamp));
         byte[] signature = CommonUtils.createSignature(contentToBeSigned, sendMessage.getSenderUserId());
         dataOutputStream.writeInt(signature.length);
