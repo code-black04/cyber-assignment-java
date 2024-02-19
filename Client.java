@@ -61,62 +61,6 @@ public class Client {
         thread.start();
     }
 
-    private void writeMessageDetailsAndSend(String actionSelection, Scanner scanner) throws IOException, InvalidKeySpecException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        if (actionSelection.equalsIgnoreCase("y")) {
-            System.out.println("Enter the recipient userid: ");
-            String recipientUserId = scanner.nextLine();
-            System.out.println("Enter your message: ");
-            String message = scanner.nextLine();
-            sendMessage(message, recipientUserId);
-        } else if (actionSelection.equalsIgnoreCase("n")) {
-            System.exit(0);
-        }
-    }
-
-    private void sendMessage(String message, String recipientUserId) {
-        if (message != null) {
-            try {
-                byte[] encryptedRecipientUserIdBytes = CommonUtils.encryptMessageWithPublicKey(recipientUserId, "server");
-                byte[] encryptedMessageBytes = CommonUtils.encryptMessageWithPublicKey(message, "server");
-                sendMessageToServer(new SendMessage(senderUserId, encryptedRecipientUserIdBytes, encryptedMessageBytes, "send-message"));
-            } catch (NoSuchPaddingException | IllegalBlockSizeException | IOException | NoSuchAlgorithmException |
-                     InvalidKeySpecException | BadPaddingException | InvalidKeyException e) {
-                throw new RuntimeException(e);
-            }
-        } else
-            System.out.println("No message found to be sent");
-    }
-
-    public void sendMessageToServer(SendMessage sendMessage) throws UnknownHostException {
-        try {
-            Socket s = new Socket(hostName, Integer.parseInt(severPort));
-
-            DataInputStream dataInputStream = new DataInputStream(s.getInputStream());
-            DataOutputStream dataOutputStream = new DataOutputStream(s.getOutputStream());
-
-            dataOutputStream.writeUTF(sendMessage.getSenderUserId());
-            dataOutputStream.writeUTF(sendMessage.getMessageType());
-            long timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-            dataOutputStream.writeLong(timestamp);
-            dataOutputStream.writeInt(sendMessage.getRecipientUserId().length);
-            dataOutputStream.write(sendMessage.getRecipientUserId());
-            dataOutputStream.writeInt(sendMessage.getMessageBody().length);
-            dataOutputStream.write(sendMessage.getMessageBody());
-            addSignature(sendMessage, timestamp, dataOutputStream);
-            CommonUtils.callCloseSocketAndStreams(dataInputStream, dataOutputStream, s);
-        } catch (Exception e) {
-            System.err.println("Cannot connect to server.");
-            e.printStackTrace();
-        }
-    }
-
-    private void addSignature(SendMessage sendMessage, long timestamp, DataOutputStream dataOutputStream) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException, SignatureException {
-        String contentToBeSigned = new String(sendMessage.getMessageBody()).concat(String.valueOf(timestamp));
-        byte[] signature = CommonUtils.createSignature(contentToBeSigned, sendMessage.getSenderUserId());
-        dataOutputStream.writeInt(signature.length);
-        dataOutputStream.write(signature);
-    }
-
     public void getMessageFromServer(SendMessage sendMessage) {
         try {
             Socket s = new Socket(hostName, Integer.parseInt(severPort));
@@ -155,15 +99,72 @@ public class Client {
             } else {
                 System.out.println("There are 0 message(s) for you.");
             }
-
             CommonUtils.callCloseSocketAndStreams(dataInputStream, dataOutputStream, s);
-
         } catch (Exception e) {
             System.err.println("Cannot connect to server.");
             e.printStackTrace();
         }
     }
 
+    private void writeMessageDetailsAndSend(String actionSelection, Scanner scanner) throws IOException, InvalidKeySpecException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+        if (actionSelection.equalsIgnoreCase("y")) {
+            System.out.println("Enter the recipient userid: ");
+            String recipientUserId = scanner.nextLine();
+            System.out.println("Enter your message: ");
+            String message = scanner.nextLine();
+            sendMessage(message, recipientUserId);
+        } else if (actionSelection.equalsIgnoreCase("n")) {
+            System.exit(0);
+        }
+    }
+
+    private void sendMessage(String message, String recipientUserId) {
+        if (message != null) {
+            try {
+                byte[] encryptedRecipientUserIdBytes = CommonUtils.encryptMessageWithPublicKey(recipientUserId, "server");
+                byte[] encryptedMessageBytes = CommonUtils.encryptMessageWithPublicKey(message, "server");
+                sendMessageToServer(new SendMessage(senderUserId, encryptedRecipientUserIdBytes, encryptedMessageBytes, "send-message"));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else
+            System.out.println("No message found to be sent");
+    }
+
+    public void sendMessageToServer(SendMessage sendMessage) throws UnknownHostException {
+        try {
+            Socket s = new Socket(hostName, Integer.parseInt(severPort));
+
+            DataInputStream dataInputStream = new DataInputStream(s.getInputStream());
+            DataOutputStream dataOutputStream = new DataOutputStream(s.getOutputStream());
+
+            dataOutputStream.writeUTF(sendMessage.getSenderUserId());
+            dataOutputStream.writeUTF(sendMessage.getMessageType());
+            long timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+            dataOutputStream.writeLong(timestamp);
+            dataOutputStream.writeInt(sendMessage.getRecipientUserId().length);
+            dataOutputStream.write(sendMessage.getRecipientUserId());
+            dataOutputStream.writeInt(sendMessage.getMessageBody().length);
+            dataOutputStream.write(sendMessage.getMessageBody());
+
+            addSignature(sendMessage, timestamp, dataOutputStream);
+            
+            CommonUtils.callCloseSocketAndStreams(dataInputStream, dataOutputStream, s);
+        } catch (Exception e) {
+            System.err.println("Cannot connect to server.");
+            e.printStackTrace();
+        }
+    }
+
+    private void addSignature(SendMessage sendMessage, long timestamp, DataOutputStream dataOutputStream) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException, SignatureException {
+        String contentToBeSigned = new String(sendMessage.getMessageBody()).concat(String.valueOf(timestamp));
+        byte[] signature = CommonUtils.createSignature(contentToBeSigned, sendMessage.getSenderUserId());
+        dataOutputStream.writeInt(signature.length);
+        dataOutputStream.write(signature);
+    }
+
+    
+    //Private Inner class
     private class SendMessage {
 
         private String senderUserId;

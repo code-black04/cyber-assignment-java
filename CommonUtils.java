@@ -1,4 +1,3 @@
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -6,12 +5,7 @@ import java.net.Socket;
 import java.security.spec.InvalidKeySpecException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.InvalidKeyException;
@@ -20,7 +14,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.*;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -31,21 +24,19 @@ public class CommonUtils {
         s.close();
     }
 
-    public static byte[] byteStreamToHandleString(DataInputStream dataInputStream, int length) throws IOException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        int nRead;
-        byte[] data = new byte[length]; // Temporary buffer
-        while ((nRead = dataInputStream.read(data, 0, data.length)) != -1) {
-            buffer.write(data, 0, nRead);
+    public static String generateMD5Hash(String input) {
+        try {
+            String appendWithPrependKey = "gfhk2024:".concat(input);
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] hashInBytes = md.digest(appendWithPrependKey.getBytes());
+            return byteArraytoHexString(hashInBytes);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("MD5 hashing algorithm not found");
         }
-        buffer.flush();
-        byte[] allData = buffer.toByteArray();
-        System.out.println("ALL Data Length : " + allData.length);
-        return allData;
     }
 
-
-    public static String toHexString(byte[] hash) {
+    //byte array to hex string conversion
+    public static String byteArraytoHexString(byte[] hash) {
         StringBuilder hexString = new StringBuilder();
         for (byte b : hash) {
             String hex = Integer.toHexString(0xff & b);
@@ -55,17 +46,7 @@ public class CommonUtils {
         return hexString.toString();
     }
 
-    public static String generateMD5Hash(String input) {
-        try {
-            String appendWithPrependKey = "gfhk2024:".concat(input);
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] hashInBytes = md.digest(appendWithPrependKey.getBytes());
-            return toHexString(hashInBytes);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 hashing algorithm not found");
-        }
-    }
-
+    //To create signature using sender's private key
     public static byte[] createSignature(String contentSent, String privateKeyName) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, IOException, InvalidKeySpecException {
         // create signature
         PrivateKey prvKey = readPrivateKey(privateKeyName);
@@ -75,6 +56,7 @@ public class CommonUtils {
         return sig.sign();
     }
 
+    //To verify signature by recipient using sender's public key
     public static Boolean verifySignature(String contentReceived, String publicKeyName, byte[] signatureReceived) throws InvalidKeyException, SignatureException, NoSuchAlgorithmException, IOException, InvalidKeySpecException {
         PublicKey pubKey = readPublicKey(publicKeyName);
         Signature sig = Signature.getInstance("SHA256withRSA");
@@ -84,6 +66,7 @@ public class CommonUtils {
         return sig.verify(signatureReceived);
     }
 
+    //To Read Private Key
     public static PrivateKey readPrivateKey(String userId) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         File f = new File(userId + ".prv");
         byte[] keyBytes = Files.readAllBytes(f.toPath());
@@ -93,6 +76,7 @@ public class CommonUtils {
         return privateKey;
     }
 
+    //To Read Public Key
     public static PublicKey readPublicKey(String userId) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         File f = new File(userId + ".pub");
         byte[] keyBytes = Files.readAllBytes(f.toPath());
@@ -102,7 +86,7 @@ public class CommonUtils {
         return publicKey;
     }
 
-    public static byte[] encryptMessageWithPublicKey(String messageToBeEncrypted, String publicKeyName) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+    public static byte[] encryptMessageWithPublicKey(String messageToBeEncrypted, String publicKeyName) throws BadPaddingException, Exception {
         Cipher encryptedCipher = Cipher.getInstance("RSA");
         encryptedCipher.init(Cipher.ENCRYPT_MODE, readPublicKey(publicKeyName));
         byte[] secretMessageBytes = messageToBeEncrypted.getBytes(StandardCharsets.UTF_8);
@@ -110,8 +94,7 @@ public class CommonUtils {
         return encryptedMessageBytes;
     }
 
-    public static String decryptMessageWithPrivate(byte[] encryptedMessageBytes, String userId) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-
+    public static String decryptMessageWithPrivate(byte[] encryptedMessageBytes, String userId) throws BadPaddingException, Exception{
         Cipher decryptCipher = Cipher.getInstance("RSA");
         decryptCipher.init(Cipher.DECRYPT_MODE, readPrivateKey(userId));
         byte[] decryptedMessageBytes = decryptCipher.doFinal(encryptedMessageBytes);
