@@ -3,12 +3,12 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 
 /**
- * @Citations
- * Referenced official Java documents:
- *      - Java Security library
- *      - Java Security specs
- *      - Java Files read & write operations
- * <b>Note:</b> All the imports are also included
+ * @Citations Referenced official Java documents:
+ * Java Security library,
+ * Java Security specs,
+ * Java Files read & write operations,
+ * <br>
+ * <br><b>Note:</b> All the imports are also included above the class
  */
 public class RSAKeyGenerator {
     public static void main(String[] args) {

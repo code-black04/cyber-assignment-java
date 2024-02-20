@@ -15,21 +15,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 /**
- * @Citations
- * Referenced official Java documents:
- *      - Socket Programming
- *      - DataInputStream
- *      - DataOutputStream
- *      - Exceptions
- *      - Javax
- *      - Java Security library
- *      - Java Utility Library
- *      - Java Data Structures
- *      - Java Time and Date
- *      - Java Nio library
- *      - Java Security specs
- *      - Java Files read & write operations
- * <b>Note:</b> All the imports are also included
+ * @Citations Referenced official Java documents:
+ * Socket Programming,
+ * DataInputStream,
+ * DataOutputStream,
+ * Exceptions,
+ * Javax,
+ * Java Security library,
+ * Java Utility Library,
+ * Java Data Structures,
+ * Java Time and Date,
+ * Java Nio library,
+ * Java Security specs,
+ * Java Files read & write operations,
+ * <br>
+ * <br><b>Note:</b> All the imports are also included above the class
  */
 public class CommonUtils {
     public static void callCloseSocketAndStreams(DataInputStream dataInputStream, DataOutputStream dataOutputStream, Socket s) throws Exception {

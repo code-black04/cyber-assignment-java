@@ -7,13 +7,13 @@ import java.util.Queue;
 import java.time.LocalDateTime;
 
 /**
- * @Citations
- * Referenced official Java documents:
- *      - Server Socket
- *      - Java Utility Library
- *      - Java Data Structures
- *      - Java Time and Date
- * <b>Note:</b> All the imports are also included
+ * @Citations Referenced official Java documents:
+ * Server Socket,
+ * Java Utility Library,
+ * Java Data Structures,
+ * Java Time and Date,
+ * <br>
+ * <br><b>Note:</b> All the imports are also included above the class
  */
 public class Server {
 
