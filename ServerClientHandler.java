@@ -26,9 +26,50 @@ class ServerClientHandler implements Runnable {
         this.socket = socket;
     }
 
+    public static byte[] createMessageBody(String message, String recipientUserId, String clientUserId, long timestamp) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Date: " + CommonUtils.writeFormattedTimestamp(timestamp) + "\n");
+        try {
+            stringBuilder.append("Message: " + message + "\n");
+            return CommonUtils.encryptMessageWithPublicKey(stringBuilder.toString(), recipientUserId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void displayMessageSummaryToClient(Queue<Server.ReceivedMessage> receivedMessageQueue, DataOutputStream dos) throws IOException, NoSuchAlgorithmException {
+
+        long timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+        dos.writeLong(timestamp);
+
+        if (receivedMessageQueue != null && !receivedMessageQueue.isEmpty()) {
+            System.out.println("delivering " + receivedMessageQueue.size() + " message(s)...\n");
+            dos.writeInt(receivedMessageQueue.size());
+            receivedMessageQueue.forEach(messageReceived -> {
+                try {
+                    dos.writeInt(messageReceived.getMessageBody().length);
+                    dos.write(messageReceived.getMessageBody());
+                    addSignature(messageReceived.getMessageBody(), timestamp, dos, "server");
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } else {
+            System.out.println("no incoming message.\n");
+            dos.writeInt(0);
+        }
+    }
+
+    private static void addSignature(byte[] messageBody, long timestamp, DataOutputStream dataOutputStream, String senderUserId) throws Exception {
+        String contentToBeSigned = new String(messageBody).concat(String.valueOf(timestamp));
+        byte[] signature = CommonUtils.createSignature(contentToBeSigned, senderUserId);
+        dataOutputStream.writeInt(signature.length);
+        dataOutputStream.write(signature);
+    }
+
     @Override
     public void run() {
-        try{
+        try {
             handleClient();
         } catch (Exception e) {
             e.getMessage();
@@ -68,7 +109,7 @@ class ServerClientHandler implements Runnable {
 
         String recipientUserId = CommonUtils.decryptMessageWithPrivate(recipientUserIdByte, "server");
         System.out.println("recipient: " + recipientUserId);
-        
+
         //Read Message Body
         int messageLength = dis.readInt();
         byte[] allEncryptedMessageData = new byte[messageLength];
@@ -103,17 +144,6 @@ class ServerClientHandler implements Runnable {
         }
     }
 
-    public static byte[] createMessageBody(String message, String recipientUserId, String clientUserId, long timestamp) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Date: " + CommonUtils.writeFormattedTimestamp(timestamp) + "\n");
-        try {
-            stringBuilder.append("Message: " + message + "\n");
-            return CommonUtils.encryptMessageWithPublicKey(stringBuilder.toString(), recipientUserId);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private synchronized void addMessageToQueue(String recipientUserId, Server.ReceivedMessage receivedMessage) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, InvalidKeySpecException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         recipientUserId = CommonUtils.generateMD5Hash(recipientUserId);
         messageQueue.putIfAbsent(recipientUserId, new ConcurrentLinkedQueue<>());
@@ -136,36 +166,6 @@ class ServerClientHandler implements Runnable {
         Queue<Server.ReceivedMessage> receivedMessages = messageQueue.getOrDefault(clientUserId, new ConcurrentLinkedQueue<>());
         messageQueue.remove(clientUserId);
         return receivedMessages;
-    }
-
-    private static void displayMessageSummaryToClient(Queue<Server.ReceivedMessage> receivedMessageQueue, DataOutputStream dos) throws IOException, NoSuchAlgorithmException {
-
-        long timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-        dos.writeLong(timestamp);
-
-        if (receivedMessageQueue != null && !receivedMessageQueue.isEmpty()) {
-            System.out.println("delivering " + receivedMessageQueue.size() + " message(s)...\n");
-            dos.writeInt(receivedMessageQueue.size());
-            receivedMessageQueue.forEach(messageReceived -> {
-                try {
-                    dos.writeInt(messageReceived.getMessageBody().length);
-                    dos.write(messageReceived.getMessageBody());
-                    addSignature(messageReceived.getMessageBody(), timestamp, dos, "server");
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        } else {
-            System.out.println("no incoming message.\n");
-            dos.writeInt(0);
-        }
-    }
-
-    private static void addSignature(byte[] messageBody, long timestamp, DataOutputStream dataOutputStream, String senderUserId) throws Exception {
-        String contentToBeSigned = new String(messageBody).concat(String.valueOf(timestamp));
-        byte[] signature = CommonUtils.createSignature(contentToBeSigned, senderUserId);
-        dataOutputStream.writeInt(signature.length);
-        dataOutputStream.write(signature);
     }
 
 }

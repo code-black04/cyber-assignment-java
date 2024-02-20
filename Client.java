@@ -39,6 +39,16 @@ public class Client {
         client.init();
     }
 
+    private static void writeMessageToDataOutputStream(SendMessage sendMessage, DataOutputStream dataOutputStream, long timestamp) throws Exception {
+        dataOutputStream.writeUTF(sendMessage.getSenderUserId());
+        dataOutputStream.writeUTF(sendMessage.getMessageType());
+        dataOutputStream.writeLong(timestamp);
+        dataOutputStream.writeInt(sendMessage.getRecipientUserId().length);
+        dataOutputStream.write(sendMessage.getRecipientUserId());
+        dataOutputStream.writeInt(sendMessage.getMessageBody().length);
+        dataOutputStream.write(sendMessage.getMessageBody());
+    }
+
     private void init() {
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -146,16 +156,6 @@ public class Client {
         }
     }
 
-    private static void writeMessageToDataOutputStream(SendMessage sendMessage, DataOutputStream dataOutputStream, long timestamp) throws Exception {
-        dataOutputStream.writeUTF(sendMessage.getSenderUserId());
-        dataOutputStream.writeUTF(sendMessage.getMessageType());
-        dataOutputStream.writeLong(timestamp);
-        dataOutputStream.writeInt(sendMessage.getRecipientUserId().length);
-        dataOutputStream.write(sendMessage.getRecipientUserId());
-        dataOutputStream.writeInt(sendMessage.getMessageBody().length);
-        dataOutputStream.write(sendMessage.getMessageBody());
-    }
-
     private void addSignature(SendMessage sendMessage, long timestamp, DataOutputStream dataOutputStream) throws Exception {
         String contentToBeSigned = new String(sendMessage.getMessageBody()).concat(String.valueOf(timestamp));
         byte[] signature = CommonUtils.createSignature(contentToBeSigned, sendMessage.getSenderUserId());
@@ -163,7 +163,7 @@ public class Client {
         dataOutputStream.write(signature);
     }
 
-    
+
     //Private Inner class
     private class SendMessage {
 

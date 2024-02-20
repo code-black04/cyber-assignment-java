@@ -103,7 +103,7 @@ public class CommonUtils {
         }
     }
 
-    public static String decryptMessageWithPrivate(byte[] encryptedMessageBytes, String userId) throws BadPaddingException, Exception{
+    public static String decryptMessageWithPrivate(byte[] encryptedMessageBytes, String userId) throws BadPaddingException, Exception {
         try {
             Cipher decryptCipher = Cipher.getInstance("RSA");
             PrivateKey privateKey = readPrivateKey(userId);
