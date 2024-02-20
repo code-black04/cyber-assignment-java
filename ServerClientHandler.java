@@ -14,6 +14,21 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * @Citations
+ * Referenced official Java documents:
+ *      - Socket Programming
+ *      - DataInputStream
+ *      - DataOutputStream
+ *      - Exceptions
+ *      - Javax
+ *      - Java Security library
+ *      - Java Utility Library
+ *      - Java Data Structures
+ *      - Java Time and Date
+ * <b>Note:</b> All the imports are also included
+ */
+
 class ServerClientHandler implements Runnable {
 
     public static final String SEND_MESSAGE_TYPE = "send-message";

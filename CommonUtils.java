@@ -6,11 +6,7 @@ import javax.crypto.Cipher;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.*;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDateTime;
@@ -18,6 +14,23 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+/**
+ * @Citations
+ * Referenced official Java documents:
+ *      - Socket Programming
+ *      - DataInputStream
+ *      - DataOutputStream
+ *      - Exceptions
+ *      - Javax
+ *      - Java Security library
+ *      - Java Utility Library
+ *      - Java Data Structures
+ *      - Java Time and Date
+ *      - Java Nio library
+ *      - Java Security specs
+ *      - Java Files read & write operations
+ * <b>Note:</b> All the imports are also included
+ */
 public class CommonUtils {
     public static void callCloseSocketAndStreams(DataInputStream dataInputStream, DataOutputStream dataOutputStream, Socket s) throws Exception {
         dataInputStream.close();

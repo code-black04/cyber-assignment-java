@@ -2,6 +2,14 @@ import java.io.FileOutputStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 
+/**
+ * @Citations
+ * Referenced official Java documents:
+ *      - Java Security library
+ *      - Java Security specs
+ *      - Java Files read & write operations
+ * <b>Note:</b> All the imports are also included
+ */
 public class RSAKeyGenerator {
     public static void main(String[] args) {
 
